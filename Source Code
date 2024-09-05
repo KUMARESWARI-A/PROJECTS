@@ -1,1 +1,80 @@
+import time
+from datetime import datetime
+import random
 
+# Simulate rural area ambulance dispatch system
+
+class Ambulance:
+    def _init_(self, id, location):
+        self.id = id
+        self.location = location
+        self.status = 'available'
+
+    def assign_to_case(self, case_location):
+        self.status = 'dispatched'
+        self.estimated_arrival = self.calculate_arrival_time(case_location)
+        print(f"Ambulance {self.id} dispatched to {case_location}. Estimated arrival time: {self.estimated_arrival} minutes.")
+    
+    def calculate_arrival_time(self, case_location):
+        # For simplicity, use a random time for arrival estimation
+        distance_factor = abs(self.location - case_location)
+        return random.randint(10, 30) + distance_factor
+    
+    def arrived_at_case(self):
+        print(f"Ambulance {self.id} has arrived at the location.")
+        self.status = 'arrived'
+
+class AmbulanceBooth:
+    def _init_(self):
+        self.ambulances = [
+            Ambulance(id=1, location=random.randint(1, 10)),
+            Ambulance(id=2, location=random.randint(1, 10)),
+            Ambulance(id=3, location=random.randint(1, 10))
+        ]
+
+    def request_ambulance(self, case_location):
+        available_ambulances = [amb for amb in self.ambulances if amb.status == 'available']
+        if not available_ambulances:
+            print("Sorry, no ambulances are available at the moment.")
+            return
+        
+        # Assign the closest ambulance
+        nearest_ambulance = min(available_ambulances, key=lambda amb: abs(amb.location - case_location))
+        nearest_ambulance.assign_to_case(case_location)
+
+    def ambulance_status(self):
+        for amb in self.ambulances:
+            print(f"Ambulance {amb.id}: Status = {amb.status}, Location = {amb.location}")
+
+def simulate_user_request():
+    # Simulating rural area people inputting case location
+    case_location = random.randint(1, 10)
+    print(f"Emergency at location {case_location}. Requesting ambulance...")
+    return case_location
+
+def main():
+    booth = AmbulanceBooth()
+
+    while True:
+        print("\n--- Ambulance Booth System ---")
+        print("1. Request an ambulance")
+        print("2. Check ambulance status")
+        print("3. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            case_location = simulate_user_request()
+            booth.request_ambulance(case_location)
+        elif choice == '2':
+            booth.ambulance_status()
+        elif choice == '3':
+            print("Exiting the system. Stay safe!")
+            break
+        else:
+            print("Invalid choice. Please try again.")
+
+        time.sleep(2)
+
+if _name_ == "_main_":
+    main()
